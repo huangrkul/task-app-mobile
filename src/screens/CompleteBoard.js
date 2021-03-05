@@ -1,19 +1,17 @@
 import React from 'react';
-import {makeStyles} from '@material-ui/core/styles';
+import { StyleSheet, View } from 'react-native';
 import TaskCard from '../components/TaskCard';
 
-const useStyles = makeStyles({
+const styles = StyleSheet.create({
   container: {
-    padding: '1rem'
+    padding: '12px'
   }
 })
 
 const CompleteBoard = (props) => {
-  
-  const classes = useStyles();
 
   return(
-    <div className={classes.container}>
+    <View style={styles.container}>
       {props.tasks.map((task, id) => {
         if(task.complete){
           return(
@@ -21,7 +19,7 @@ const CompleteBoard = (props) => {
           )
         }
       })}
-    </div>
+    </View>
   )
 }
 

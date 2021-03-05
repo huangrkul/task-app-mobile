@@ -1,13 +1,16 @@
 import React, {useState, useContext, useEffect} from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import PendingBoard from '../components/PendingBoard';
+import PendingBoard from './PendingBoard';
 import CompleteBoard from './CompleteBoard';
 import {Card} from 'react-native-paper';
-import {store} from './store.js';
+import {store} from '../js/store.js';
 
 const styles = StyleSheet.create({
   container: {
     width: '100%',
+  },
+  topNav: {
+    flexDirection: 'row'
   },
   contentBox: {
     padding: '16px',
@@ -31,10 +34,10 @@ const MainTaskBoard = (props) => {
   },[])
 
   return(
-    <View style={classes.container}>
-      <View>
-        <View style={pendingFocus} onPress={() => {setPending(true)}}>Pending</View>
-        <View style={completeFocus} onPress={() => {setPending(false)}}>Completed</View>
+    <View style={styles.container}>
+      <View style={styles.topNav}>
+        <Text style={pendingFocus} onPress={() => {setPending(true)}}>Pending</Text>
+        <Text style={completeFocus} onPress={() => {setPending(false)}}>Completed</Text>
       </View>
       <Card elevation={3} style={styles.contentBox}>
         {isPending ? <PendingBoard tasks={globalState.state.tasks} /> : <CompleteBoard tasks={globalState.state.tasks} />}

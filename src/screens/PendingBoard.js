@@ -1,24 +1,22 @@
 import React, {useContext} from 'react';
-import {makeStyles} from '@material-ui/core/styles';
-import AddCircleIcon from '@material-ui/icons/AddCircle';
+import { StyleSheet, View, Button } from 'react-native';
+import CustomIcon from '../components/CustomIcon';
 import TaskCard from '../components/TaskCard';
-import {store} from './store.js';
+import {store} from '../js/store.js';
 import uuid from 'react-uuid';
 
-const useStyles = makeStyles({
+const styles = StyleSheet.create({
   container: {
-    padding: '1rem'
+    padding: '12px'
   },
   addButton: {
     color: 'red',
-    fontSize: '3em',
-    cursor: 'pointer'
+    fontSize: '24px',
   },
 })
 
 const PendingBoard = (props) => {
   
-  const classes = useStyles();
   const globalState = useContext(store);
   const {dispatch} = globalState;
 
@@ -28,7 +26,7 @@ const PendingBoard = (props) => {
   }
 
   return(
-    <div className={classes.container}>
+    <View style={styles.container}>
       {props.tasks.map((task, id) => {
         if(!task.complete){
           return(
@@ -36,8 +34,10 @@ const PendingBoard = (props) => {
           )
         }
       })}
-      <aside style={{textAlign: 'right'}}><AddCircleIcon onClick={() => {createTask()}} className={classes.addButton}/></aside>
-    </div>
+      <Button onPress={() => {createTask()}}>
+        <CustomIcon name={'pluscircle'} size={25} color='red' />
+      </Button>
+    </View>
   )
 }
 
