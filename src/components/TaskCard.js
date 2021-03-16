@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { StyleSheet, View, TouchableWithoutFeedback } from "react-native";
+import { StyleSheet, View, Pressable } from "react-native";
 import { Card, Text, Button, Checkbox, TextInput } from "react-native-paper";
 import { store } from "../js/store.js";
 import CustomIcon from "../components/CustomIcon";
@@ -13,9 +13,7 @@ const styles = StyleSheet.create({
     cursor: "pointer",
   },
   infoBar: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
+    justifyContent: "flex-start",
     flexWrap: "wrap",
   },
   titleBar: {
@@ -25,11 +23,15 @@ const styles = StyleSheet.create({
     width: "50px",
     height: "50px",
   },
+  titleInput: {
+    width: "80%",
+  },
   buttonGroup: {
     width: "100%",
     flexDirection: "row",
     marginTop: "32px",
     justifyContent: "center",
+    alignItems: "center",
   },
   buttons: {
     backgroundColor: "#eee",
@@ -61,6 +63,7 @@ const styles = StyleSheet.create({
     borderWidth: "8px",
     borderStyle: "solid",
   },
+  buttonCollapse: {},
   panel: {
     display: "flex",
   },
@@ -73,12 +76,14 @@ const TaskCard = (props) => {
   const globalState = useContext(store);
   const { dispatch } = globalState;
   const [priority, setPriority] = useState(props.priority);
-  const [isExpand, setExpand] = useState(props.isExpanded);
+  const [isExpanded, setExpand] = useState(props.isExpanded);
   const [date, setDate] = useState(new Date());
+  const [title, setTitle] = useState(props.title);
 
   const buttonOneStyle = priority === 1 ? styles.buttonOneActive : "";
   const buttonTwoStyle = priority === 2 ? styles.buttonTwoActive : "";
   const buttonThreeStyle = priority === 3 ? styles.buttonThreeActive : "";
+  const expandStyle = isExpanded ? styles.panel : styles.hide;
 
   const handleChange = (category, value) => {
     const newList = [...globalState.state.tasks];
@@ -89,9 +94,10 @@ const TaskCard = (props) => {
           : true;
         dispatch({ type: "tasks", payload: newList });
         break;
-      // case "title":
-      //   newList[props.index].title = value;
-      //   break;
+      case "title":
+        setTitle(value);
+        newList[props.index].title = value;
+        break;
       case "priority":
         setPriority(value);
         newList[props.index].priority = value;
@@ -100,67 +106,81 @@ const TaskCard = (props) => {
       //   setDate(value);
       //   newList[props.index].dueDate = value;
       //   break;
-      // case "expand":
-      //   newList[props.index].isExpanded = value;
-      //   setExpand(newList[props.index].isExpanded);
-      // default:
-      //   break;
+      case "expand":
+        newList[props.index].isExpanded = value;
+        setExpand(newList[props.index].isExpanded);
+      default:
+        break;
     }
   };
 
   return (
     <Card style={styles.main}>
-      <TouchableWithoutFeedback style={styles.infoBar}>
+      <Pressable
+        style={styles.infoBar}
+        onPress={() => {
+          handleChange("expand", true);
+        }}
+      >
         <View>
           <View style={styles.titleBar}>
             <Button
-              onPress={(e) => {
-                e.stopPropagation();
+              onPress={() => {
                 handleChange("check");
               }}
             >
               <CustomIcon
-                name={isChecked ? "checkbox-marked" : "checkbox-blank"}
+                name={props.complete ? "checkbox-marked" : "checkbox-blank"}
                 size="45px"
                 color="gray"
               />
             </Button>
-            <TextInput />
+            <TextInput
+              editable={isExpanded ? true : false}
+              value={title}
+              onChange={() => {
+                handleChange("title", e.target.value);
+              }}
+              style={styles.titleInput}
+            />
           </View>
           <View></View>
         </View>
-      </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback>
-        <View style={styles.buttonGroup}>
-          <Button
-            onPress={(e) => {
-              e.stopPropagation();
-              handleChange("priority", 1);
-            }}
-            style={[styles.buttons, buttonOneStyle]}
-          >
-            low
-          </Button>
-          <Button
-            onPress={(e) => {
-              e.stopPropagation();
-              handleChange("priority", 2);
-            }}
-            style={[styles.buttons, buttonTwoStyle]}
-          >
-            medium
-          </Button>
-          <Button
-            onPress={(e) => {
-              e.stopPropagation();
-              handleChange("priority", 3);
-            }}
-            style={[styles.buttons, buttonThreeStyle]}
-          >
-            high
-          </Button>
-        </View>
-      </TouchableWithoutFeedback>
+      </Pressable>
+      <View style={[styles.buttonGroup, expandStyle]}>
+        <Button
+          onPress={(e) => {
+            handleChange("priority", 1);
+          }}
+          style={[styles.buttons, buttonOneStyle]}
+        >
+          low
+        </Button>
+        <Button
+          onPress={(e) => {
+            handleChange("priority", 2);
+          }}
+          style={[styles.buttons, buttonTwoStyle]}
+        >
+          medium
+        </Button>
+        <Button
+          onPress={(e) => {
+            handleChange("priority", 3);
+          }}
+          style={[styles.buttons, buttonThreeStyle]}
+        >
+          high
+        </Button>
+        <Button
+          onPress={() => {
+            handleChange("expand", false);
+          }}
+          style={styles.buttonCollapse}
+        >
+          <CustomIcon name="arrow-collapse-up" color="gray" />
+        </Button>
+      </View>
     </Card>
   );
 };
